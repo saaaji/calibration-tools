@@ -1,5 +1,5 @@
 from ..core.camera import Camera
-from ..core.backends import BaslerConfig
+from ..core.config import BaslerConfig
 
 class BaslerCamera(Camera):
     # stub

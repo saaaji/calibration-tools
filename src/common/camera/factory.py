@@ -1,8 +1,8 @@
-from ..core.backends import CameraConfig
-from .cv import OpenCvConfig, OpenCvCamera
-from .basler import BaslerConfig, BaslerCamera
+from .core.config import CameraConfig
+from .backend_impl.cv import OpenCvConfig, OpenCvCamera
+from .backend_impl.basler import BaslerConfig, BaslerCamera
 
-def instantiate(config: CameraConfig):
+def create_camera(config: CameraConfig):
     if isinstance(config, OpenCvConfig):
         return OpenCvCamera(config)
     elif isinstance(config, BaslerConfig):

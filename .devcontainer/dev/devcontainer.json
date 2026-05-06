@@ -1,5 +1,5 @@
 {
-    "name": "cuda-dev",
+    "name": "dev",
     "initializeCommand": ".devcontainer/generate-devices.sh",
     "dockerComposeFile": [
         "docker-compose.yml",
