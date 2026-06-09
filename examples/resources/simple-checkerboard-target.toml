@@ -1,0 +1,5 @@
+[target]
+type = "checkerboard"
+rows = 8
+cols = 8
+checker_size_mm = 40

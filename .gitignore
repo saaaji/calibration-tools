@@ -1,5 +1,7 @@
 .devcontainer/docker-compose.devices.yml
 __pycache__/
+.vscode/
 
+*.egg-info/
 calib_*/
 calib_*

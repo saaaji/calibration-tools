@@ -1,0 +1,6 @@
+[[cameras]] # id:wc, skip
+name = "webcam"
+width = 1920
+height = 1080
+backend = "cv"
+device = 0

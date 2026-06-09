@@ -4,6 +4,7 @@ from pydantic import BaseModel, Field
 class BaseCameraConfig(BaseModel):
     flip_horizontal: bool = False
     flip_vertical: bool = False
+    name: str
     width: int
     height: int
 

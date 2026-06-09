@@ -1,3 +1,0 @@
-[[cameras]]
-backend = "cv"
-device = 0
