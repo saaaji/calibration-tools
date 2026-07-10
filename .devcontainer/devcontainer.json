@@ -1,10 +1,10 @@
 {
-    "name": "dev",
+    "name": "calib-dev",
     "initializeCommand": ".devcontainer/generate-devices.sh",
     "dockerComposeFile": [
         "docker-compose.yml",
-        "../docker-compose.devices.yml"
+        "docker-compose.devices.yml"
     ],
-    "service": "dev",
+    "service": "calib-dev",
     "workspaceFolder": "/workspace"
 }

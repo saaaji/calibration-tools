@@ -1,0 +1,10 @@
+services:
+  calib-dev:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      target: dev
+    volumes:
+      - ..:/workspace
+    devices:
+      - /dev/bus/usb:/dev/bus/usb
