@@ -1,4 +1,0 @@
-pypylon
-pydantic
-tomlkit
-typer
