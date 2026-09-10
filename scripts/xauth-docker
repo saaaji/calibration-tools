@@ -1,0 +1,16 @@
+#!/bin/bash
+
+set -euo pipefail
+
+XAUTH=/tmp/docker.xauth
+
+rm -rf "$XAUTH"
+touch "$XAUTH"
+
+xauth nlist "$DISPLAY" \
+  | sed 's/^..../ffff/' \
+  | xauth -f "$XAUTH" nmerge -
+
+chmod 600 "$XAUTH"
+
+echo "wrote X11 auth cookie to $XAUTH"

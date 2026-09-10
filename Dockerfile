@@ -3,14 +3,15 @@ WORKDIR /workspace
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    ca-certificates \
-    curl \
-    git \
     build-essential \
     cmake \
     ninja-build \
     python3 \
-    python3-pip \
+    python3-dev \
+    python3-numpy \
+    pybind11-dev \
+    libeigen3-dev \
+    libopencv-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # mrcal
@@ -23,7 +24,12 @@ RUN echo "deb [trusted=yes] http://mrcal.secretsauce.net/packages/trixie/public/
     python3-mrgingham \
     && rm -rf /var/lib/apt/lists/*
 
-# rust
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+# build libraries
+COPY . .
+
+RUN cmake -S . -B build -G Ninja \
+ && cmake --build build -j \
+ && cmake --install build \
+ && ldconfig
 
 CMD ["sleep", "infinity"]

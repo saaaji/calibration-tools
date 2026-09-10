@@ -1,0 +1,9 @@
+services:
+  calibration-tools:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: calibration-tools
+    volumes:
+      - .:/workspace
+      - ~/hive-calib:/hive-calib
