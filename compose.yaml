@@ -4,6 +4,8 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: calibration-tools
+    environment:
+      PYTHONPATH: /workspace/src
     volumes:
       - .:/workspace
       - ~/hive-calib:/hive-calib
