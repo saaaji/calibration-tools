@@ -1,28 +1,67 @@
 import cv2
 import numpy as np
-import utilities
-from calibration_tools import detection
+import yaml
+import argparse
+from pydantic import TypeAdapter
+from pathlib import Path
+from utilities import gallery
+from calibration_tools.detection import (
+    Detection,
+    DetectorConfig,
+    make_detector,
+    process_dataset_detections,
+)
+
+CAL_ROOT = Path("/hive-calib")
 
 if __name__ == "__main__":
-    mat = cv2.imread(
-        "/hive-calib/calib_20260909T065057Z/left/000001.png", cv2.IMREAD_GRAYSCALE
-    )
-    # mat = np.stack((mat,) * 3, axis=-1)
-
-    det = detection.make_detector(
-        detection.WeakCheckerboardConfig(
-            type="weak_checkerboard", rows=7, cols=10, spacing_m=0.1
-        )
+    # parse arguments
+    parser = argparse.ArgumentParser(
+        prog="calibrate",
+        description="process hive calibration batch",
     )
 
-    obs = det.detect(mat)
-    print(obs)
-    dbg = det.draw_detection(mat, obs)
-    dbg = cv2.resize(dbg, None, fx=0.5, fy=0.5)
+    parser.add_argument("-t", "--target", required=True, type=str, help="target name")
 
-    with utilities.TextBox(dbg) as tb:
-        tb.write("left/000001.png")
+    parser.add_argument(
+        "-b",
+        "--batch",
+        required=False,
+        # append to the calibration root directory
+        type=lambda path: CAL_ROOT.joinpath(path),
+        # pull latest batch if unspecified
+        default=max(
+            (path for path in CAL_ROOT.iterdir() if path.is_dir()),
+            key=lambda path: path.stat().st_mtime,
+        ).name,
+        help="calibration batch name",
+    )
 
-    cv2.imshow("mat", dbg)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    parser.add_argument("-d", "--debug", required=False, action="store_true")
+
+    args = parser.parse_args()
+
+    # load inputs
+    detector_config_adapter = TypeAdapter(DetectorConfig)
+    detector_config = detector_config_adapter.validate_python(
+        yaml.safe_load(CAL_ROOT.joinpath(args.target).read_text())
+    )
+    detector = make_detector(detector_config)
+
+    if not args.batch.exists() or not args.batch.is_dir():
+        raise ValueError("calibration batch name should specify a valid directory")
+
+    # process dataset
+    detections = process_dataset_detections(detector_config, detector, args.batch)
+
+    if args.debug:
+
+        def debug_image(det: Detection) -> np.ndarray:
+            debug = detector.draw_detection(det.image, det.observation)
+            debug = cv2.resize(debug, None, fx=0.5, fy=0.5)
+            return debug
+
+        for camera_name, camera_detections in detections.items():
+            gallery(camera_name, camera_detections, debug_image)
+
+    # calibrate

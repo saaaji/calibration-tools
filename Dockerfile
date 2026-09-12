@@ -11,6 +11,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3-dev \
     python3-numpy \
     python3-pydantic \
+    python3-tqdm \
     pybind11-dev \
     libeigen3-dev \
     libopencv-dev \
