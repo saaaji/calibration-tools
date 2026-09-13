@@ -2,6 +2,8 @@ import cv2
 import numpy as np
 import yaml
 import argparse
+import mrcal
+from calibration_tools import mrcal_helpers
 from pydantic import TypeAdapter
 from pathlib import Path
 from utilities import gallery
@@ -37,7 +39,21 @@ if __name__ == "__main__":
         help="calibration batch name",
     )
 
-    parser.add_argument("-d", "--debug", required=False, action="store_true")
+    parser.add_argument(
+        "-f",
+        "--focal-estimate",
+        required=True,
+        type=float,
+        help="focal length estimate",
+    )
+
+    parser.add_argument(
+        "-d",
+        "--debug",
+        required=False,
+        action="store_true",
+        help="enable debug features",
+    )
 
     args = parser.parse_args()
 
@@ -65,3 +81,29 @@ if __name__ == "__main__":
             gallery(camera_name, camera_detections, debug_image)
 
     # calibrate
+    (
+        camera_names,
+        used_frame_ids,
+        observations,
+        indices_frame_camera,
+        imagersizes,
+        imagepaths,
+    ) = mrcal_helpers.assemble_mrcal_observations(detections)
+
+    opt_inputs = mrcal_helpers.solve(
+        camera_names,
+        used_frame_ids,
+        observations,
+        indices_frame_camera,
+        imagersizes,
+        imagepaths,
+        args.focal_estimate,
+        detector.board,
+    )
+
+    models = [
+        mrcal.cameramodel(optimization_inputs=opt_inputs, icam_intrinsics=icam)
+        for icam in range(len(camera_names))
+    ]
+    for camera_name, model in zip(camera_names, models):
+        model.write(f"{camera_name}.cameramodel")
