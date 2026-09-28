@@ -105,5 +105,12 @@ if __name__ == "__main__":
         mrcal.cameramodel(optimization_inputs=opt_inputs, icam_intrinsics=icam)
         for icam in range(len(camera_names))
     ]
+
+    # keep calibrations under /tmp
+    output_dir = Path("/tmp/hive-models") / args.batch.name
+    output_dir.mkdir(parents=True, exist_ok=True)
+
     for camera_name, model in zip(camera_names, models):
-        model.write(f"{camera_name}.cameramodel")
+        output_path = output_dir / f"{camera_name}.cameramodel"
+        model.write(str(output_path))
+        print(f"wrote {output_path}")

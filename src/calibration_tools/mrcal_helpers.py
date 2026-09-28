@@ -131,7 +131,8 @@ def solve(
     rt_ref_frame 
     """
 
-    lensmodel = "LENSMODEL_SPLINED_STEREOGRAPHIC_order=3_Nx=30_Ny=18_fov_x_deg=120"
+    #lensmodel = "LENSMODEL_SPLINED_STEREOGRAPHIC_order=3_Nx=30_Ny=18_fov_x_deg=120"
+    lensmodel = "LENSMODEL_OPENCV8"
 
     # I have no seed. I compute a rough seed, and run a few preliminary,
     # incremental optimizations to get it reasonably-close to the right

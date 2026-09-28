@@ -35,4 +35,7 @@ RUN cmake -S . -B build -G Ninja \
  && cmake --install build \
  && ldconfig
 
+# configure env
+ENV PYTHONPATH=/workspace/src
+
 CMD ["sleep", "infinity"]

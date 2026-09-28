@@ -1,0 +1,62 @@
+#!/bin/bash
+
+# Overview:
+# Push camera models from a calibration batch to a robot.
+#
+# Usage:
+#   ./push-models <robot-hostname> [batch-name]
+#
+# If batch-name is omitted, the latest calib_* batch under /tmp/hive-models is used.
+
+set -euo pipefail
+
+HOST="${1:?Usage: push-models <robot-hostname> [batch-name]}"
+ROBOT="robot@$HOST"
+BATCH_NAME="${2:-}"
+
+REMOTE_ROOT="/home/robot/hive-rs/config/calibrations"
+LOCAL_ROOT="/tmp/hive-models"
+
+if [[ -z "$BATCH_NAME" ]]; then
+  latest="$(
+    find "$LOCAL_ROOT" \
+      -maxdepth 1 \
+      -type d \
+      -name 'calib_*' |
+      sort |
+      tail -n 1
+  )"
+
+  if [[ -z "$latest" ]]; then
+    echo "no models found under $LOCAL_ROOT"
+    exit 1
+  fi
+
+  BATCH_NAME="$(basename "$latest")"
+fi
+
+LOCAL_PATH="$LOCAL_ROOT/$BATCH_NAME"
+
+if [[ ! -d "$LOCAL_PATH" ]]; then
+  echo "batch not found: $LOCAL_PATH"
+  exit 1
+fi
+
+shopt -s nullglob
+MODELS=("$LOCAL_PATH"/*.cameramodel)
+shopt -u nullglob
+
+if [[ "${#MODELS[@]}" -eq 0 ]]; then
+  echo "no .cameramodel files found in $LOCAL_PATH"
+  exit 1
+fi
+
+echo "pushing $BATCH_NAME to $HOST"
+
+ssh "$ROBOT" "mkdir -p '$REMOTE_ROOT'"
+
+rsync -av --progress \
+  "${MODELS[@]}" \
+  "$ROBOT:$REMOTE_ROOT/"
+
+echo "pushed ${#MODELS[@]} model(s) to $HOST:$REMOTE_ROOT"
