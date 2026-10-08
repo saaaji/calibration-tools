@@ -132,16 +132,19 @@ class StrongCheckerboard:
         return self._board
 
     def detect(self, image: np.ndarray) -> np.ndarray | None:
-        points = mrgingham.find_board(image, gridn=self._board.rows)
+        points, levels = mrgingham.find_board(
+            image, gridn=self._board.rows, report_refinement_level=True
+        )
 
         if points is None:
             return None
 
         points = points.reshape(self._board.rows, self._board.cols, 2)
+        levels = levels.reshape(self._board.rows, self._board.cols)
         result = np.empty((*points.shape[:2], 3), dtype=np.float64)
 
         result[..., :2] = points
-        result[..., 2] = 1.0
+        result[..., 2] = np.exp2(-levels)
 
         return result
 
@@ -279,17 +282,13 @@ DatasetDetections = dict[str, CameraDetections]
 
 
 def gamma_correct(image: np.ndarray, gamma: float) -> np.ndarray:
+    # replicate preprocessing that mrgingham CLI does
     clahe = cv2.createCLAHE(
-        clipLimit=2.0,
+        clipLimit=8,
         tileGridSize=(8, 8),
     )
 
-    # return image
-
-    return clahe.apply(image)
-
-    # lut = np.array([((i / 255) ** 0.75) * 255 for i in range(256)], dtype=np.uint8)
-    # return cv2.LUT((image), lut)
+    return cv2.blur(clahe.apply(image), (3, 3))
 
 
 def camera_cache(detector_config: DetectorConfig, camera_root: Path) -> Path:

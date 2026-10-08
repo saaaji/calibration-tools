@@ -1,4 +1,4 @@
-FROM debian:trixie-slim
+FROM debian:forky-slim
 WORKDIR /workspace
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -15,13 +15,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     pybind11-dev \
     libeigen3-dev \
     libopencv-dev \
-    && rm -rf /var/lib/apt/lists/*
-
-# mrcal
-RUN echo "deb [trusted=yes] http://mrcal.secretsauce.net/packages/trixie/public/ trixie main" \
-    > /etc/apt/sources.list.d/mrcal.list \
-    && apt-get update \
-    && apt-get install -y --no-install-recommends \
     mrcal \
     python3-mrcal \
     python3-mrgingham \
