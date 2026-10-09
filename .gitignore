@@ -1,4 +1,10 @@
+# artifacts
 build/
 __pycache__/
+
+# keep out junk
 *.png
 *.cameramodel
+
+!assets/icons/*.png
+!assets/models/*.cameramodel

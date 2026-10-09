@@ -10,6 +10,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
     python3-dev \
     python3-numpy \
+    python3-scipy \
+    python3-opencv \
+    python3-sklearn \
+    python3-skimage \
+    python3-matplotlib \
+    python3-pandas \
     python3-pydantic \
     python3-tqdm \
     pybind11-dev \
@@ -18,6 +24,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     mrcal \
     python3-mrcal \
     python3-mrgingham \
+    python3-ipykernel \
+    python3-ipywidgets \
     && rm -rf /var/lib/apt/lists/*
 
 # build libraries
