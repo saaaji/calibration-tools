@@ -140,11 +140,12 @@ class StrongCheckerboard:
             return None
 
         points = points.reshape(self._board.rows, self._board.cols, 2)
-        levels = levels.reshape(self._board.rows, self._board.cols)
+        if levels is not None:
+            levels = levels.reshape(self._board.rows, self._board.cols)
         result = np.empty((*points.shape[:2], 3), dtype=np.float64)
 
         result[..., :2] = points
-        result[..., 2] = np.exp2(-levels)
+        result[..., 2] = np.exp2(-levels) if levels is not None else 1.0
 
         return result
 
